@@ -148,5 +148,35 @@ class GreedyBustersAgent(BustersAgent):
 
 
         "*** YOUR CODE HERE ***"
+        ghost_pos_array = []
+        min_dis = 99999
+        min_pos = 0
+        min_dis_to_Ghost = 99999
+        action = None
+
+        for items in livingGhostPositionDistributions:# Find the position of each ghost
+            value = 0
+            value_key = None
+            for key, number in items.items():
+                if number>value:
+                    value = number
+                    value_key=key
+            ghost_pos_array.append(value_key)
+
+        for i in range(len(ghost_pos_array)):# get position of the closet one
+            distance = self.distancer.getDistance(pacmanPosition,ghost_pos_array[i])
+            if distance < min_dis:
+                min_dis = distance
+                min_Pos = ghost_pos_array[i]
+
+        for a in legal:#get action
+            pos_after = Actions.getSuccessor(pacmanPosition, a)
+            distance_to_ghost = self.distancer.getDistance(pos_after, min_Pos)
+            if distance_to_ghost < min_dis_to_Ghost:
+                action = a
+                min_dis_to_Ghost = distance_to_ghost
+
+
+        return action
 
 
