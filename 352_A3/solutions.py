@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -40,8 +40,15 @@ def normalize(self):
     >>> empty
     {}
     """
-    "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    # *** YOUR CODE HERE ***"
+    # If the total value of the distribution is 0, do nothing
+    if self.total() == 0:
+        return
+    # Normalize the distribution total value of all keys sums to 1
+    factor = 1.0/self.total()
+    for k in self:
+        self[k] = self[k]*factor
+
 
 def sample(self):
     """
@@ -64,8 +71,18 @@ def sample(self):
     >>> round(samples.count('d') * 1.0/N, 1)
     0.0
     """
-    "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    # *** YOUR CODE HERE ***
+    # If the distribution is not normalized.
+    if self.total() != 1:
+        normalize(self)
+    # Set a random float value
+    rand_val = random.random()
+    # Draw a random sample from the distribution
+    total = 0
+    for k, v in self.items():
+        total += v
+        if rand_val <= total:
+            return k
 
 
 def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition):
