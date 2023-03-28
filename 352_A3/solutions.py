@@ -41,9 +41,12 @@ def normalize(self):
     {}
     """
     # *** YOUR CODE HERE ***"
+    # if the distribution is empty then do nothing
+    if len(self.keys()) == 0:
+        return None
     # If the total value of the distribution is 0, do nothing
     if self.total() == 0:
-        return
+        return None
     # Normalize the distribution total value of all keys sums to 1
     factor = 1.0/self.total()
     for k in self:
@@ -72,6 +75,13 @@ def sample(self):
     0.0
     """
     # *** YOUR CODE HERE ***
+     # if the distribution is empty then do nothing
+    if len(self.keys()) == 0:
+        return None
+    # If the total value of the distribution is 0, do nothing
+    if self.total() == 0:
+        return None
+
     # If the distribution is not normalized.
     if self.total() != 1:
         normalize(self)
@@ -90,7 +100,12 @@ def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailP
     Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
     """
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    if  ghostPosition == jailPosition and noisyDistance == None:
+        return 1
+    elif ghostPosition == jailPosition or noisyDistance == None:
+        return 0
+        
+    return busters.getObservationProbability(noisyDistance, util.manhattanDistance(pacmanPosition, ghostPosition))
 
 
 
