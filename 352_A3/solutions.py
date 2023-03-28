@@ -139,4 +139,10 @@ def elapseTime(self, gameState):
     current position is known.
     """
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+    # Get the previous ghost position
+    oldPos = gameState.getGhostPsition()
+    # Get the distribution over new positions for the ghost, given its previous position
+    newPosDist = self.getPositionDistribution(gameState, oldPos)
+    # Update the belief at every position on the map
+    for p in newPosDist:
+        observeUpdate(self, newPosDist[p], gameState)
