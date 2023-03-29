@@ -145,50 +145,44 @@ class GreedyBustersAgent(BustersAgent):
         livingGhostPositionDistributions = \
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
+
         if len(legal) == 0:
-            return None          # Nothing to do!
+            return None          # Nothing to do! There are no legal moves
 
         lgDist = livingGhostPositionDistributions  # aliasing bc it gets v long
-        print("livingGhostPositionDistributions = {}".format(
-            livingGhostPositionDistributions))
 
-        mostLikelyPosition = list()  # most likely position for each ghost
-        # most likely = max probability from distribution
-        # we'd want to do this after getting the list of most likely positions
-        # not here
+        mostLikelyPositions = list()  # most likely position for each ghost
+        # most likely = max probability from ghost's distribution
 
         for i in range(len(lgDist)):  # for each ghost
-            # i ghost index in livingGhost...
-            mostLikelyPosition.append(lgDist[i].argMax())
-            # mostLikelyPosition[mostLikelyPos] = i  # ghostIndex = i+1
-            #                       (x, y)
-            # assumes no 2 ghosts in the same position, or will overwrite
+            # i -> ghost index in livingGhostPositionDistributions
+            mostLikelyPositions.append(lgDist[i].argMax())
 
-        # closest = list(mostLikelyPosition.keys())[0]
-        closest = mostLikelyPosition[0]
-        # take first ghost at random
-        for i in range(len(mostLikelyPosition)):
+        closest = mostLikelyPositions[0]  # take first ghost at random
+        smallestDist = self.distancer.getDistance(pacmanPosition, closest)
+
+        for i in range(len(mostLikelyPositions)):
             # determining closest ghost
             mazeDistance = self.distancer.getDistance(pacmanPosition,
-                                                      mostLikelyPosition[i])
-            if mazeDistance < closest:
-                closest = mostLikelyPosition[i]
-                # track the ghostAgentIndex here too??
+                                                      mostLikelyPositions[i])
+            if mazeDistance < smallestDist:
+                closest = mostLikelyPositions[i]
 
-            # === greedy action choosing ===
-            # for moves in legal moves
-            # -> using successor fn determine the next position
-            # whichever fn gives the smallest new mazeDistance is chosen
+        # === greedy action choosing ===
+        # for moves in legal moves
+        # -> using successor fn determine the next position
+        # whichever fn gives the smallest new/remaining mazeDistance is chosen
 
         successorPositions = list()
 
         # first
         successorPosition = Actions.getSuccessor(pacmanPosition, legal[0])
+        # assured legal has at least 1 move, otherwise we return at top itself
         successorPositions.append(successorPosition)
         mazeDistance = self.distancer.getDistance(pacmanPosition,
                                                   successorPosition)
         smallestDist = mazeDistance
-        action = legal[0]
+        chosenAction = legal[0]
         for i in range(1, len(legal)):
             successorPosition = Actions.getSuccessor(
                 pacmanPosition, legal[i])
@@ -197,6 +191,6 @@ class GreedyBustersAgent(BustersAgent):
                                                       successorPosition)
             if mazeDistance < smallestDist:
                 smallestDist = mazeDistance
-                action = legal[i]
+                chosenAction = legal[i]
 
-        return action
+        return chosenAction
