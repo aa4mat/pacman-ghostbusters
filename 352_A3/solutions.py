@@ -151,8 +151,19 @@ def elapseTime(self, gameState):
     current position is known.
     """
     "*** YOUR CODE HERE ***"
+    numAgents = gameState.getNumAgents()  # number of agents
+    # print("number of agents (2?) = {}".format(numAgents))
+    ghostAgentIndex = numAgents - 1
     # Get the previous ghost position
-    oldPos = gameState.getGhostPosition() # < args needed
+    oldPos = gameState.getGhostPosition(ghostAgentIndex)
+    # pacMan is agentIndex 0, the first ghost is agentIndex 1 and so on.
+    # for multiple ghosts, loop over number of ghosts.
+
+    # error for ghost - ghost is None?
+    # line 279, in getGhostPosition
+    # ***     return self.data.agentStates[agentIndex].getPosition()
+    # *** AttributeError: 'NoneType' object has no attribute 'getPosition'
+
     # Get the distribution over new positions for the ghost,
     # given its previous position
     newPosDist = self.getPositionDistribution(gameState, oldPos)
