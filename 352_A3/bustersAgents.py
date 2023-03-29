@@ -123,11 +123,12 @@ from distanceCalculator import Distancer
 from game import Actions
 from game import Directions
 
+
 class GreedyBustersAgent(BustersAgent):
-    "An agent that charges the closest ghost."
+    """An agent that charges the closest ghost."""
 
     def registerInitialState(self, gameState):
-        "Pre-computes the distance between every two points."
+        """Pre-computes the distance between every two points."""
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
 
@@ -137,46 +138,38 @@ class GreedyBustersAgent(BustersAgent):
         not yet been captured, then chooses an action that brings
         Pacman closest to the closest ghost (according to mazeDistance!).
         """
+        "*** YOUR CODE HERE ***"
         pacmanPosition = gameState.getPacmanPosition()
         legal = [a for a in gameState.getLegalPacmanActions()]
         livingGhosts = gameState.getLivingGhosts()
         livingGhostPositionDistributions = \
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i+1]]
+        mostLikelyPosition = dict()  # most likely position for each ghost
+        closest = livingGhostPositionDistributions[0].getPosition()
+        # or something. initially
+
+        for i in range(len(livingGhostPositionDistributions)):  # for each ghost
+            # i+1 -> ghost index
+            mostLikelyPosition[i] = livingGhostPositionDistributions.argMax()
+            # (x, y)
+            # assumes no 2 ghosts in the same position, or will overwrite
+
+            # determining closest ghost
+            mazeDistance = self.distancer.getDistance(pacmanPosition,
+                                                      mostLikelyPosition[i])
+            if mazeDistance < closest:
+                closest = mostLikelyPosition[i]
+                # track the ghostAgentIndex here too??
+
+            # todo -> greedy action choosing
 
 
 
 
-        "*** YOUR CODE HERE ***"
-        ghost_pos_array = []
-        min_dis = 99999
-        min_pos = 0
-        min_dis_to_Ghost = 99999
-        action = None
-
-        for items in livingGhostPositionDistributions:# Find the position of each ghost
-            value = 0
-            value_key = None
-            for key, number in items.items():
-                if number>value:
-                    value = number
-                    value_key=key
-            ghost_pos_array.append(value_key)
-
-        for i in range(len(ghost_pos_array)):# get position of the closet one
-            distance = self.distancer.getDistance(pacmanPosition,ghost_pos_array[i])
-            if distance < min_dis:
-                min_dis = distance
-                min_Pos = ghost_pos_array[i]
-
-        for a in legal:#get action
-            pos_after = Actions.getSuccessor(pacmanPosition, a)
-            distance_to_ghost = self.distancer.getDistance(pos_after, min_Pos)
-            if distance_to_ghost < min_dis_to_Ghost:
-                action = a
-                min_dis_to_Ghost = distance_to_ghost
 
 
-        return action
+
+
 
 
