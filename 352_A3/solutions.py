@@ -152,7 +152,7 @@ def elapseTime(self, gameState):
     """
     "*** YOUR CODE HERE ***"
     # Get the previous ghost position
-    oldPos = gameState.getGhostPsition()
+    oldPos = gameState.getGhostPosition() # < args needed
     # Get the distribution over new positions for the ghost,
     # given its previous position
     newPosDist = self.getPositionDistribution(gameState, oldPos)
