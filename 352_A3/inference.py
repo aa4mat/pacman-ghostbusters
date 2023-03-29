@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -132,7 +132,8 @@ class InferenceModule:
             jail = self.getJailPosition(index)
             gameState = self.setGhostPositions(gameState, pos)
         pacmanPosition = gameState.getPacmanPosition()
-        ghostPosition = gameState.getGhostPosition(index + 1)  # The position you set
+        ghostPosition = gameState.getGhostPosition(index + 1)
+        # The position you set
         dist = DiscreteDistribution()
         if pacmanPosition == ghostPosition:  # The ghost has been caught!
             dist[jail] = 1.0
@@ -173,6 +174,9 @@ class InferenceModule:
 
         IMPLEMENT IN SOLUTIONS.PY
         """
+        print("Noisy = {}\npacmanPos = {}\nghost = {}\njail = {}".format(
+            noisyDistance, pacmanPosition, ghostPosition, jailPosition
+        ))
         return(solutions.getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition))
 
     def setGhostPosition(self, gameState, ghostPosition, index):
@@ -207,6 +211,7 @@ class InferenceModule:
         Collect the relevant noisy distance observation and pass it along.
         """
         distances = gameState.getNoisyGhostDistances()
+        print("Noisy distances = {}".format(distances))
         if len(distances) >= self.index:  # Check for missing observations
             obs = distances[self.index - 1]
             self.obs = obs
@@ -283,7 +288,7 @@ class ExactInference(InferenceModule):
         IMPLEMENT IN SOLUTIONS.PY
         """
         solutions.observeUpdate(self, observation, gameState)
-        
+
 
     def elapseTime(self, gameState):
         """
