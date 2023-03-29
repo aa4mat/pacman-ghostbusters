@@ -18,6 +18,7 @@ from util import raiseNotDefined
 import random
 import busters
 
+
 def normalize(self):
     """
     Normalize the distribution such that the total value of all keys sums
@@ -48,9 +49,9 @@ def normalize(self):
     if self.total() == 0:
         return None
     # Normalize the distribution total value of all keys sums to 1
-    factor = 1.0/self.total()
+    factor = 1.0 / self.total()
     for k in self:
-        self[k] = self[k]*factor
+        self[k] = self[k] * factor
 
 
 def sample(self):
@@ -75,7 +76,7 @@ def sample(self):
     0.0
     """
     # *** YOUR CODE HERE ***
-     # if the distribution is empty then do nothing
+    # if the distribution is empty then do nothing
     if len(self.keys()) == 0:
         return None
     # If the total value of the distribution is 0, do nothing
@@ -95,18 +96,20 @@ def sample(self):
             return k
 
 
-def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition):
+def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition,
+                       jailPosition):
     """
     Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
     """
     "*** YOUR CODE HERE ***"
-    if  ghostPosition == jailPosition and noisyDistance == None:
+    if ghostPosition == jailPosition and noisyDistance is None:
         return 1
-    elif ghostPosition == jailPosition or noisyDistance == None:
+    elif ghostPosition == jailPosition or noisyDistance is None:
         return 0
-        
-    return busters.getObservationProbability(noisyDistance, util.manhattanDistance(pacmanPosition, ghostPosition))
 
+    return busters.getObservationProbability(noisyDistance,
+                                             util.manhattanDistance(
+                                                 pacmanPosition, ghostPosition))
 
 
 def observeUpdate(self, observation, gameState):
@@ -125,7 +128,17 @@ def observeUpdate(self, observation, gameState):
     position is known.
     """
     "*** YOUR CODE HERE ***"
-    raiseNotDefined()
+
+    for position in self.allPositions:
+        belief = self.beliefs[position] * self.getObservationProb(
+            observation, gameState.getPacmanPosition(),
+            position, self.getJailPosition())
+        # P(ghost) * P(observation | ghost, pacman)
+
+        # new belief = P(ghost | observation)
+        self.beliefs[position] = belief
+        # update belief for each position
+
     self.beliefs.normalize()
 
 
@@ -133,7 +146,6 @@ def elapseTime(self, gameState):
     """
     Predict beliefs in response to a time step passing from the current
     state.
-
     The transition model is not entirely stationary: it may depend on
     Pacman's current position. However, this is not a problem, as Pacman's
     current position is known.
@@ -141,7 +153,8 @@ def elapseTime(self, gameState):
     "*** YOUR CODE HERE ***"
     # Get the previous ghost position
     oldPos = gameState.getGhostPsition()
-    # Get the distribution over new positions for the ghost, given its previous position
+    # Get the distribution over new positions for the ghost,
+    # given its previous position
     newPosDist = self.getPositionDistribution(gameState, oldPos)
     # Update the belief at every position on the map
     for p in newPosDist:
