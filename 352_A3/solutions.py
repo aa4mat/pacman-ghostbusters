@@ -142,7 +142,9 @@ def observeUpdate(self, observation, gameState):
     self.beliefs.normalize()
 
 
+
 def elapseTime(self, gameState):
+
     """
     Predict beliefs in response to a time step passing from the current
     state.
@@ -151,23 +153,19 @@ def elapseTime(self, gameState):
     current position is known.
     """
     "*** YOUR CODE HERE ***"
-    numAgents = gameState.getNumAgents()  # number of agents
-    # print("number of agents (2?) = {}".format(numAgents))
-    for ghostAgentIndex in range(1, numAgents):
-        # Get the previous (current) ghost position
-        oldPos = gameState.getGhostPosition(ghostAgentIndex)
-        # pacMan is agentIndex 0, the first ghost is agentIndex 1 and so on.
-        # for multiple ghosts, loop over number of ghosts.
+    lastPos = {}
+    copy = self.beliefs.copy()
 
-        # error for ghost - ghost is None?
-        # line 279, in getGhostPosition
-        # ***     return self.data.agentStates[agentIndex].getPosition()
-        # *** AttributeError: 'NoneType' object has no attribute 'getPosition'
+    for ghostPosBefore in self.allPositions:
+            posDist = self.getPositionDistribution(gameState, ghostPosBefore)
+            lastPos[ghostPosBefore] = posDist
 
-        # Get the distribution over new positions for the ghost,
-        # given its previous position
-        # P(newPos | oldPos)
-        newPosDist = self.getPositionDistribution(gameState, oldPos)
-        # Update the belief at every position on the map
-        for p in newPosDist:
-            observeUpdate(self, newPosDist[p], gameState)
+
+    for ghostPosAfter in self.allPositions:
+            x = 0
+            for ghostPosBefore in self.allPositions:
+                x += self.beliefs[ghostPosBefore] * lastPos[ghostPosBefore][ghostPosAfter]
+
+            copy[ghostPosAfter] = x
+
+    self.beliefs = copy
