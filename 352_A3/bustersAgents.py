@@ -147,7 +147,7 @@ class GreedyBustersAgent(BustersAgent):
              if livingGhosts[i+1]]
 
         if len(legal) == 0:
-            return None          # Nothing to do! There are no legal moves
+            return None  # Nothing to do! There are no legal moves
 
         lgDist = livingGhostPositionDistributions  # aliasing bc it gets v long
 
@@ -172,23 +172,25 @@ class GreedyBustersAgent(BustersAgent):
         # for moves in legal moves
         # -> using successor fn determine the next position
         # whichever fn gives the smallest new/remaining mazeDistance is chosen
+        # new distance = next position -> ghost's most likely position (closest)
 
         successorPositions = list()
 
-        # first
+        # initialising the first one so that comparison is easier
         successorPosition = Actions.getSuccessor(pacmanPosition, legal[0])
         # assured legal has at least 1 move, otherwise we return at top itself
         successorPositions.append(successorPosition)
-        mazeDistance = self.distancer.getDistance(pacmanPosition,
-                                                  successorPosition)
-        smallestDist = mazeDistance
+        mazeDistance = self.distancer.getDistance(successorPosition,
+                                                  closest)
+        smallestDist = mazeDistance  # initially
         chosenAction = legal[0]
-        for i in range(1, len(legal)):
+
+        for i in range(1, len(legal)):   # loop over rest
             successorPosition = Actions.getSuccessor(
                 pacmanPosition, legal[i])
             successorPositions.append(successorPosition)
-            mazeDistance = self.distancer.getDistance(pacmanPosition,
-                                                      successorPosition)
+            mazeDistance = self.distancer.getDistance(successorPosition,
+                                                      closest)
             if mazeDistance < smallestDist:
                 smallestDist = mazeDistance
                 chosenAction = legal[i]
