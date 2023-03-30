@@ -18,7 +18,6 @@ from util import raiseNotDefined
 import random
 import busters
 
-
 def normalize(self):
     """
     Normalize the distribution such that the total value of all keys sums
@@ -41,17 +40,17 @@ def normalize(self):
     >>> empty
     {}
     """
-    # *** YOUR CODE HERE ***"
-    # if the distribution is empty then do nothing
+    "*** YOUR CODE HERE ***"
+    # If the distribution is empty then do nothing
     if len(self.keys()) == 0:
         return None
     # If the total value of the distribution is 0, do nothing
     if self.total() == 0:
         return None
     # Normalize the distribution total value of all keys sums to 1
-    factor = 1.0 / self.total()
+    factor = 1.0/self.total()
     for k in self:
-        self[k] = self[k] * factor
+        self[k] = self[k]*factor
 
 
 def sample(self):
@@ -75,15 +74,14 @@ def sample(self):
     >>> round(samples.count('d') * 1.0/N, 1)
     0.0
     """
-    # *** YOUR CODE HERE ***
-    # if the distribution is empty then do nothing
+    "*** YOUR CODE HERE ***"
+    # If the distribution is empty then do nothing
     if len(self.keys()) == 0:
         return None
     # If the total value of the distribution is 0, do nothing
     if self.total() == 0:
         return None
-
-    # If the distribution is not normalized.
+    # If the distribution is not normalized
     if self.total() != 1:
         normalize(self)
     # Set a random float value
@@ -96,20 +94,18 @@ def sample(self):
             return k
 
 
-def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition,
-                       jailPosition):
+def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition):
     """
     Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
     """
-    "*** YOUR CODE HERE ***"
-    if ghostPosition == jailPosition and noisyDistance is None:
+    if  ghostPosition == jailPosition and noisyDistance == None:
         return 1
-    elif ghostPosition == jailPosition or noisyDistance is None:
+    elif ghostPosition == jailPosition or noisyDistance == None:
         return 0
-
-    return busters.getObservationProbability(noisyDistance,
-                                             util.manhattanDistance(
-                                                 pacmanPosition, ghostPosition))
+    # Find the distance between Pacman's location and the ghost's location
+    trueDistance = util.manhattanDistance(pacmanPosition, ghostPosition)
+    # Return the probability distribution over distance readings given the true distance from Pacman to the ghost
+    return busters.getObservationProbability(noisyDistance, trueDistance)
 
 
 def observeUpdate(self, observation, gameState):
@@ -127,8 +123,6 @@ def observeUpdate(self, observation, gameState):
     current position. However, this is not a problem, as Pacman's current
     position is known.
     """
-    "*** YOUR CODE HERE ***"
-
     for position in self.allPositions:
         belief = self.beliefs[position] * self.getObservationProb(
             observation, gameState.getPacmanPosition(),
@@ -142,30 +136,32 @@ def observeUpdate(self, observation, gameState):
     self.beliefs.normalize()
 
 
-
 def elapseTime(self, gameState):
-
     """
     Predict beliefs in response to a time step passing from the current
     state.
+
     The transition model is not entirely stationary: it may depend on
     Pacman's current position. However, this is not a problem, as Pacman's
     current position is known.
     """
-    "*** YOUR CODE HERE ***"
-    lastPos = {}
-    copy = self.beliefs.copy()
+    beliefs_copy = self.beliefs.copy()
 
-    for ghostPosBefore in self.allPositions:
-            posDist = self.getPositionDistribution(gameState, ghostPosBefore)
-            lastPos[ghostPosBefore] = posDist
+    # A dict contain new positions for the ghost
+    newPosDistros = {}
+    # oldPos refers to the previous ghost position
+    for oldPos in self.allPositions:
+        # newPos refers to the distribution over new position for the ghost, given its previous position
+        newPos = self.getPositionDistribution(gameState, oldPos)
+        # Add the new position to the dict
+        newPosDistros[oldPos] = newPos
 
-
-    for ghostPosAfter in self.allPositions:
-            x = 0
-            for ghostPosBefore in self.allPositions:
-                x += self.beliefs[ghostPosBefore] * lastPos[ghostPosBefore][ghostPosAfter]
-
-            copy[ghostPosAfter] = x
-
-    self.beliefs = copy
+    for newPos in self.allPositions:
+        prob = 0
+        for oldPos in self.allPositions:
+            # Get the probability distribution over new positions for the ghost
+            prob = prob + self.beliefs[oldPos] * newPosDistros[oldPos][newPos]
+        # Update belief copy
+        beliefs_copy[newPos] = prob
+    # Update belief
+    self.beliefs = beliefs_copy
